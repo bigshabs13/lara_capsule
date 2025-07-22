@@ -15,4 +15,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/capsules/{id}', [CapsuleController::class, 'show']);
     Route::get('/capsules', [CapsuleController::class, 'index']);
     Route::get('/public-wall', [CapsuleController::class, 'publicWall']);
+    Route::put('/capsules/{id}', [CapsuleController::class, 'update']);
+    Route::patch('/capsules/{id}', [CapsuleController::class, 'update']);
+    Route::delete('/capsules/{id}', [CapsuleController::class, 'destroy']);
 });
