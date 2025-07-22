@@ -53,6 +53,14 @@ class CapsuleController extends Controller
         return response()->json($capsule);
     }
 
+    /**
+     * Display a listing of all capsules.
+     */
+    public function index()
+    {
+        return response()->json(Capsule::all());
+    }
+
     public function publicWall(Request $request)
     {
         $capsules = Capsule::where('is_public', true)
@@ -61,4 +69,39 @@ class CapsuleController extends Controller
         return view('capsules.public_wall', compact('capsules'));
     }
 
+    /**
+     * Update the specified capsule.
+     */
+    public function update(Request $request, $id)
+    {
+        $capsule = Capsule::findOrFail($id);
+        if ($capsule->user_id !== $request->user()->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        $request->validate([
+            'message' => 'sometimes|string|max:500',
+            'gps_latitude' => 'sometimes|numeric',
+            'gps_longitude' => 'sometimes|numeric',
+            'mood_id' => 'nullable|exists:moods,id',
+            'reveal_at' => 'sometimes|date|after:now',
+            'is_public' => 'boolean',
+        ]);
+        $capsule->update($request->only([
+            'message', 'gps_latitude', 'gps_longitude', 'mood_id', 'is_public', 'reveal_at'
+        ]));
+        return response()->json(['message' => 'Capsule updated successfully.', 'capsule' => $capsule]);
+    }
+
+    /**
+     * Remove the specified capsule.
+     */
+    public function destroy(Request $request, $id)
+    {
+        $capsule = Capsule::findOrFail($id);
+        if ($capsule->user_id !== $request->user()->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        $capsule->delete();
+        return response()->json(['message' => 'Capsule deleted successfully.']);
+    }
 }
