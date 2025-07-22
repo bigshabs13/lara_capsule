@@ -13,4 +13,9 @@ class Capsule extends Model
         'user_id', 'message', 'gps_latitude', 'gps_longitude', 'ip_address',
         'mood_id', 'is_public', 'reveal_at', 'revealed_at', 'country'
     ];
+
+    public function mood()
+    {
+        return $this->belongsTo(Mood::class);
+    }
 }

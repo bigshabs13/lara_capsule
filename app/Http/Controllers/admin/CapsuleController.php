@@ -54,54 +54,47 @@ class CapsuleController extends Controller
     }
 
     /**
-     * Display a listing of all capsules.
+     * Display a paginated, filtered listing of all capsules.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Capsule::all());
+        $query = Capsule::query();
+
+        if ($request->has('country')) {
+            $query->where('country', $request->country);
+        }
+        if ($request->has('mood_id')) {
+            $query->where('mood_id', $request->mood_id);
+        }
+        if ($request->has('from') && $request->has('to')) {
+            $query->whereBetween('reveal_at', [$request->from, $request->to]);
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $capsules = $query->paginate($perPage);
+        return response()->json($capsules);
     }
 
+    /**
+     * Display a paginated, filtered listing of public, revealed capsules.
+     */
     public function publicWall(Request $request)
     {
-        $capsules = Capsule::where('is_public', true)
-            ->where('reveal_at', '<=', now())
-            ->get();
-        return view('capsules.public_wall', compact('capsules'));
-    }
+        $query = Capsule::where('is_public', true)
+            ->where('reveal_at', '<=', now());
 
-    /**
-     * Update the specified capsule.
-     */
-    public function update(Request $request, $id)
-    {
-        $capsule = Capsule::findOrFail($id);
-        if ($capsule->user_id !== $request->user()->id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        if ($request->has('country')) {
+            $query->where('country', $request->country);
         }
-        $request->validate([
-            'message' => 'sometimes|string|max:500',
-            'gps_latitude' => 'sometimes|numeric',
-            'gps_longitude' => 'sometimes|numeric',
-            'mood_id' => 'nullable|exists:moods,id',
-            'reveal_at' => 'sometimes|date|after:now',
-            'is_public' => 'boolean',
-        ]);
-        $capsule->update($request->only([
-            'message', 'gps_latitude', 'gps_longitude', 'mood_id', 'is_public', 'reveal_at'
-        ]));
-        return response()->json(['message' => 'Capsule updated successfully.', 'capsule' => $capsule]);
-    }
+        if ($request->has('mood_id')) {
+            $query->where('mood_id', $request->mood_id);
+        }
+        if ($request->has('from') && $request->has('to')) {
+            $query->whereBetween('reveal_at', [$request->from, $request->to]);
+        }
 
-    /**
-     * Remove the specified capsule.
-     */
-    public function destroy(Request $request, $id)
-    {
-        $capsule = Capsule::findOrFail($id);
-        if ($capsule->user_id !== $request->user()->id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-        $capsule->delete();
-        return response()->json(['message' => 'Capsule deleted successfully.']);
+        $perPage = $request->get('per_page', 10);
+        $capsules = $query->paginate($perPage);
+        return response()->json($capsules);
     }
 }
