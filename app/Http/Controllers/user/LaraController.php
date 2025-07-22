@@ -7,5 +7,7 @@ use Illuminate\Http\Request;
 
 class LaraController extends Controller
 {
-    //
+    function index(){
+        return "hello";
+    }
 }
