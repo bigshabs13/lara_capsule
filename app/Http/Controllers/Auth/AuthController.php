@@ -68,4 +68,15 @@ class AuthController extends Controller
     {
         return response()->json(JWTAuth::parseToken()->authenticate());
     }
+
+    public function profile(Request $request)
+    {
+        $user = $request->user();
+        $capsuleTitles = $user->capsules()->pluck('message', 'id'); // or use a 'title' field if you have one
+
+        return response()->json([
+            'user' => $user,
+            'capsule_titles' => $capsuleTitles
+        ]);
+    }
 }

@@ -18,6 +18,12 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'password' => bcrypt('password'),
+            'is_admin' => false
         ]);
+
+        $this->call(MoodSeeder::class);
+        \App\Models\User::factory()->count(40)->create();
+        \App\Models\Capsule::factory()->count(40)->create();
     }
 }

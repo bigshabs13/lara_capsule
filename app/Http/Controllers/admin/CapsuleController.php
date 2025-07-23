@@ -97,4 +97,12 @@ class CapsuleController extends Controller
         $capsules = $query->paginate($perPage);
         return response()->json($capsules);
     }
+
+    public function allCapsules(Request $request)
+    {
+        if (!$request->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        return response()->json(\App\Models\Capsule::all());
+    }
 }

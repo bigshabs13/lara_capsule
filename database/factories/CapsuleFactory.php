@@ -14,12 +14,12 @@ class CapsuleFactory extends Factory
     public function definition()
     {
         return [
-            'user_id' => User::factory(), // or pick an existing user ID
+            'user_id' => \App\Models\User::inRandomOrder()->first()?->id,
             'message' => $this->faker->sentence(10),
             'gps_latitude' => $this->faker->latitude,
             'gps_longitude' => $this->faker->longitude,
             'ip_address' => $this->faker->ipv4,
-            'mood_id' => Mood::inRandomOrder()->first()?->id, // or null
+            'mood_id' => \App\Models\Mood::inRandomOrder()->first()?->id,
             'is_public' => $this->faker->boolean(80),
             'reveal_at' => $this->faker->dateTimeBetween('+1 days', '+1 year'),
             'revealed_at' => null,
